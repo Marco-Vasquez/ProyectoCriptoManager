@@ -8,7 +8,10 @@ int validarEntero(string mensaje);
 string cifrarCesar(string texto,int clave);
 string descifrarCesar(string texto,int clave);
 string cifrarXOR(string texto,string clave);
-string descifrarXOR(string mensaje,string clave);
+string descifrarXOR(string texto,string clave);
+string cifrarVigenere(string texto,string clave);
+string descifrarVigenere(string texto,string clave);
+
 int main()
 {
     SetConsoleOutputCP(65001);
@@ -19,11 +22,10 @@ int main()
         cout<<"--- MENÚ PRINCIPAL ---"<<endl;
         cout<<"1. Cifrado César"<<endl;
         cout<<"2. Descifrado César"<<endl;
-        cout<<"3. Cifrado XOR"<<endl;
-        cout<<"4. Descifrar XOR"<<endl;
-        cout<<"5. Cifrado Vigénere"<<endl;
-        cout<<"6. Descifrar Vigénere"<<endl;
-        cout<<"7. Salir"<<endl;
+        cout<<"3. Cifrado XOR (protopito descifrado)"<<endl;
+        cout<<"4. Cifrado Vigénere"<<endl;
+        cout<<"5. Descifrar Vigénere"<<endl;
+        cout<<"6. Salir"<<endl;
         opcion=validarEntero("Ingrese una opción: ");
         switch(opcion){
         case 1:{
@@ -39,7 +41,7 @@ int main()
             string mensaje;
             cout<<"Ingrese el mensaje cifrado: ";
             getline(cin,mensaje);
-            int clave=validarEntero("Ingrese la clave: ");
+            int clave=validarEntero("Ingrese la clave (1-26): ");
             mensaje=descifrarCesar(mensaje,clave);
             cout<<"Mensaje descifrado: "<<mensaje<<"\n"<<endl;
             break;
@@ -58,19 +60,29 @@ int main()
             break;
         }
         case 4:{
-            cout<<"Proximamente"<<endl;
+            string mensaje;
+            cout<<"Ingrese el mensaje: ";
+            getline(cin,mensaje);
+            string clave;
+            cout<<"Ingrese la clave: ";
+            getline(cin,clave);
+            string cifrado=cifrarVigenere(mensaje,clave);
+            cout<<"Mensaje cifrado: "<<cifrado<<endl;
             break;
         }
         case 5:{
-            cout<<"Proximamente"<<endl;
+            string mensaje;
+            cout<<"Ingrese el mensaje: ";
+            getline(cin,mensaje);
+            string clave;
+            cout<<"Ingrese la clave: ";
+            getline(cin,clave);
+            string descifrado=descifrarVigenere(mensaje,clave);
+            cout<<"Mensaje descifrado: "<<descifrado<<endl;
             break;
         }
         case 6:{
-            cout<<"Proximamente"<<endl;
-            break;
-        }
-        case 7:{
-            cout<<"Proximamente"<<endl;
+            cout<<"Saliendo...\n"<<endl;
             break;
         }
         default:{
@@ -78,7 +90,7 @@ int main()
             break;
         }
         }
-    }while(opcion!=7);
+    }while(opcion!=6);
     return 0;
 }
 int validarEntero(string mensaje){
@@ -86,10 +98,10 @@ int validarEntero(string mensaje){
     while(true){
         cout<<mensaje;
         cin>>n;
-        if(cin.fail()||n<=0){
+        if(cin.fail() || n<=0 || n>26){
             cin.clear();
             cin.ignore(1000,'\n');
-            cout<<"Entrada invalida, ingrese un numero entero positivo\n";
+            cout<<"Entrada invalida, ingrese un numero entero positivo válido\n";
         }else{
             cin.ignore(1000,'\n');
             return n;
@@ -99,7 +111,8 @@ int validarEntero(string mensaje){
 string cifrarCesar(string texto,int clave){
     string resultado="";
     clave=clave%26;
-    for(char letra:texto){
+    for(int i=0;i<texto.length();i++){
+        char letra=texto[i];
         if(isupper(letra)){
             resultado+=char((letra-'A'+clave)%26+'A');
         }
@@ -115,7 +128,8 @@ string cifrarCesar(string texto,int clave){
 string descifrarCesar(string texto,int clave){
     string resultado="";
     clave=clave%26;
-    for(char letra:texto){
+    for(int i=0;i<texto.length();i++){
+        char letra=texto[i];
         if(isupper(letra)){
             resultado+=char((letra-'A'-clave+26)%26+'A');
         }
@@ -139,4 +153,42 @@ string cifrarXOR(string texto,string clave){
 }
 string descifrarXOR(string texto,string clave){
     return cifrarXOR(texto,clave);
+}
+string cifrarVigenere(string texto,string clave){
+    string resultado="";
+    int longitudClave=clave.length();
+    for(int i=0;i<texto.length();i++){
+        char letra=texto[i];
+        char caracterClave=clave[i%longitudClave];
+        int valorClave=toupper(caracterClave)-'A';
+        if(isupper(letra)){
+            resultado+=char((letra-'A'+valorClave)%26+'A');
+        }
+        else if(islower(letra)){
+            resultado+=char((letra-'a'+valorClave)%26+'a');
+        }
+        else{
+            resultado+=letra;
+        }
+    }
+    return resultado;
+}
+string descifrarVigenere(string texto,string clave){
+    string resultado="";
+    int longitudClave=clave.length();
+    for(int i=0;i<texto.length();i++){
+        char letra=texto[i];
+        char caracterClave=clave[i%longitudClave];
+        int valorClave=toupper(caracterClave)-'A';
+        if(isupper(letra)){
+            resultado+=char((letra-'A'-valorClave+26)%26+'A');
+        }
+        else if(islower(letra)){
+            resultado+=char((letra-'a'-valorClave+26)%26+'a');
+        }
+        else{
+            resultado+=letra;
+        }
+    }
+    return resultado;
 }
