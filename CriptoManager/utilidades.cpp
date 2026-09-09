@@ -3,6 +3,8 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 int Utilidades::validarEntero(string mensaje,int maximo){
     int n;
     while(true){
@@ -11,7 +13,9 @@ int Utilidades::validarEntero(string mensaje,int maximo){
         if(cin.fail() || n<=0 || n>maximo){
             cin.clear();
             cin.ignore(1000,'\n');
+            Utilidades::colorTexto(12);
             cout<<"Entrada invalida, ingrese un numero entre 1 y "<<maximo<<endl;
+            Utilidades::colorTexto(7);
         }
         else{
             cin.ignore(1000,'\n');
@@ -25,7 +29,9 @@ string Utilidades::leerTextoNoVacio(string mensaje){
         cout<<mensaje;
         getline(cin,texto);
         if(texto.empty()){
-            cout<<"El texto no puede estar vacio"<<endl;
+            Utilidades::colorTexto(12);
+            cout<<"El texto no puede estar vacio\n"<<endl;
+            Utilidades::colorTexto(7);
         }
     }while(texto.empty());
     return texto;
@@ -46,7 +52,9 @@ string Utilidades::convertirHex(string texto){
 void Utilidades::copiarBinario(string rutaEntrada,string rutaSalida){
     ifstream entrada(rutaEntrada,ios::binary);
     if(!entrada){
-        cout<<"No se puedo abrir el archivo de entrada"<<endl;
+        Utilidades::colorTexto(12);
+        cout<<"No se puedo abrir el archivo de entrada\n"<<endl;
+        Utilidades::colorTexto(7);
         return;
     }
     entrada.seekg(0,ios::end);
@@ -56,10 +64,18 @@ void Utilidades::copiarBinario(string rutaEntrada,string rutaSalida){
     entrada.read((char*)buffer,size);
     entrada.close();
     ofstream salida(rutaSalida,ios::binary);
+    if(!salida){
+        Utilidades::colorTexto(12);
+        cout<<"No se pudo crear el archivo, verifique la ruta"<<endl;
+        delete[] buffer;
+        return;
+    }
     salida.write((char*)buffer,size);
     salida.close();
     delete[] buffer;
-    cout<<"Archivo copiado: "<<size<<" bytes"<<endl;
+    Utilidades::colorTexto(10);
+    cout<<"Archivo copiado: "<<size<<" bytes\n"<<endl;
+    Utilidades::colorTexto(7);
 }
 string Utilidades::leerClaveAlfabetica(string mensaje){
     string clave;
@@ -74,8 +90,14 @@ string Utilidades::leerClaveAlfabetica(string mensaje){
             }
         }
         if(!valida){
+            Utilidades::colorTexto(12);
             cout<<"La clave debe tener solo letras, sin espacios ni simbolos\n"<<endl;
+            Utilidades::colorTexto(7);
         }
     }while(!valida);
     return clave;
+}
+void Utilidades::colorTexto(int color){
+    HANDLE consola=GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(consola,color);
 }

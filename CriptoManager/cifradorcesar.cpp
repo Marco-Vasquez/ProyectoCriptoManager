@@ -36,3 +36,9 @@ string CifradorCesar::descifrar(string texto){
     }
     return resultado;
 }
+char CifradorCesar::cifrarByte(unsigned char byte,int posicion){
+    return (char)((byte+clave)%256);
+}
+char CifradorCesar::descifrarByte(unsigned char byte,int posicion){
+    return (char)((byte-clave+256)%256);
+}

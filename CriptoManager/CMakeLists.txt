@@ -8,6 +8,9 @@ add_executable(CriptoManager main.cpp
     cifradorxor.h cifradorxor.cpp
     cifradorvigenere.h cifradorvigenere.cpp
     utilidades.h utilidades.cpp
+    gestorarchivos.h gestorarchivos.cpp
+    usuario.h usuario.cpp
+    gestorusuarios.h gestorusuarios.cpp
 )
 target_link_options(CriptoManager PRIVATE -static -static-libgcc -static-libstdc++)
 include(GNUInstallDirs)

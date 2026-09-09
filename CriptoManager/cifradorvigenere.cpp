@@ -42,3 +42,11 @@ string CifradorVigenere::descifrar(string texto){
     }
     return resultado;
 }
+char CifradorVigenere::cifrarByte(unsigned char byte,int posicion){
+    unsigned char byteClave=(unsigned char)clave[posicion%clave.length()];
+    return (char)((byte+byteClave)%256);
+}
+char CifradorVigenere::descifrarByte(unsigned char byte,int posicion){
+    unsigned char byteClave=(unsigned char)clave[posicion%clave.length()];
+    return (char)((byte-byteClave+256)%256);
+}

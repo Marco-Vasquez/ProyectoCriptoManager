@@ -11,6 +11,7 @@ public:
     static string convertirHex(string texto);
     static void copiarBinario(string rutaEntrada,string rutaSalida);
     static string leerClaveAlfabetica(string mensaje);
+    static void colorTexto(int color);
 };
 
 #endif // UTILIDADES_H
