@@ -1,10 +1,13 @@
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 #include "utilidades.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <iomanip>
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+#include <limits>
+#include <commdlg.h>
+#include <ctime>
 int Utilidades::validarEntero(string mensaje,int maximo){
     int n;
     while(true){
@@ -100,4 +103,67 @@ string Utilidades::leerClaveAlfabetica(string mensaje){
 void Utilidades::colorTexto(int color){
     HANDLE consola=GetStdHandle(STD_OUTPUT_HANDLE);
     SetConsoleTextAttribute(consola,color);
+}
+void Utilidades::limpiarPantalla(){
+#ifdef _WIN32
+    system("cls");
+#else
+system("clear");
+#endif
+}
+void Utilidades::pausarPantalla(){
+    cout<<"Presione ENTER para continuar..."<<endl;
+    if(cin.rdbuf()->in_avail()>0){ //evalua si el buffer tiene algo por limpiar, si lo tiene lo limpia
+        cin.ignore(numeric_limits<streamsize>::max(),'\n');
+    }
+    cin.get();
+}
+string Utilidades::seleccionarArchivo(){
+    char rutaSeleccionada[260]="";
+    OPENFILENAMEA ventana;
+    ZeroMemory(&ventana,sizeof(ventana));
+    ventana.lStructSize=sizeof(ventana);
+    ventana.hwndOwner=NULL;
+    ventana.lpstrFile=rutaSeleccionada;
+    ventana.nMaxFile=260;
+    ventana.lpstrFilter="Todos los archivos\0*.*\0";
+    ventana.nFilterIndex=1;
+    ventana.Flags=OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+    if(GetOpenFileNameA(&ventana)){
+        return string(rutaSeleccionada);
+    }
+    return "";
+}
+string Utilidades::guardarArchivoComo(){
+    char rutaSeleccionada[260]="";
+    OPENFILENAMEA ventana;
+    ZeroMemory(&ventana,sizeof(ventana));
+    ventana.lStructSize=sizeof(ventana);
+    ventana.hwndOwner=NULL;
+    ventana.lpstrFile=rutaSeleccionada;
+    ventana.nMaxFile=260;
+    ventana.lpstrFilter="Todos los archivos\0*.*\0";
+    ventana.nFilterIndex=1;
+    ventana.Flags=OFN_OVERWRITEPROMPT;
+    if(GetSaveFileNameA(&ventana)){
+        return string(rutaSeleccionada);
+    }
+    return "";
+}
+string Utilidades::obtenerFechaHora(){
+    time_t ahora=time(0);
+    tm* horaLocal=localtime(&ahora);
+    char buffer[20];
+    strftime(buffer,sizeof(buffer),"%Y-%m-%d %H:%M:%S",horaLocal);
+    return string(buffer);
+}
+string Utilidades::hexATexto(string hexTexto){
+    string resultado="";
+    stringstream flujo(hexTexto);
+    string par;
+    while(flujo>>par){
+        int valor=stoi(par,nullptr,16);
+        resultado+=(char)valor;
+    }
+    return resultado;
 }

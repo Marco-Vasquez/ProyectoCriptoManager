@@ -12,6 +12,12 @@ public:
     static void copiarBinario(string rutaEntrada,string rutaSalida);
     static string leerClaveAlfabetica(string mensaje);
     static void colorTexto(int color);
+    static void limpiarPantalla();
+    static void pausarPantalla();
+    static string seleccionarArchivo();
+    static string guardarArchivoComo();
+    static string obtenerFechaHora();
+    static string hexATexto(string hexTexto);
 };
 
 #endif // UTILIDADES_H
