@@ -18,6 +18,9 @@ public:
     static string guardarArchivoComo();
     static string obtenerFechaHora();
     static string hexATexto(string hexTexto);
+    static bool esArchivoTexto(string ruta);
+    static string leerContenidoArchivo(string ruta);
+    static string rutaBase();
 };
 
 #endif // UTILIDADES_H

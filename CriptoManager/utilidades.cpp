@@ -167,3 +167,30 @@ string Utilidades::hexATexto(string hexTexto){
     }
     return resultado;
 }
+bool Utilidades::esArchivoTexto(string ruta){
+    if(ruta.length()<4){
+        return false;
+    }
+    string extension=ruta.substr(ruta.length()-4);
+    for(int i=0;i<extension.length();i++){
+        extension[i]=tolower(extension[i]);
+    }
+    return extension==".txt";
+}
+string Utilidades::leerContenidoArchivo(string ruta){
+    ifstream entrada(ruta,ios::binary);
+    if(!entrada){
+        return "";
+    }
+    stringstream flujo;
+    flujo<<entrada.rdbuf();
+    entrada.close();
+    return flujo.str();
+}
+string Utilidades::rutaBase(){
+    char ruta[MAX_PATH];
+    GetModuleFileNameA(NULL,ruta,MAX_PATH);
+    string rutaCompleta(ruta);
+    int pos=rutaCompleta.find_last_of("\\/");
+    return rutaCompleta.substr(0,pos+1);
+}

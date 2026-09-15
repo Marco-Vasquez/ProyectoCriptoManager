@@ -19,9 +19,9 @@ int main(){
     cout<<"--- Proyecto: Cripto-Manager Cifrador y Descifrador de archivos ---"<<endl;
     Utilidades::colorTexto(7);
     GestorUsuarios gestorUsuarios;
-    gestorUsuarios.cargarDesdeArchivo("usuarios.txt");
+    gestorUsuarios.cargarDesdeArchivo(Utilidades::rutaBase()+"usuarios.txt");
     HistorialOperaciones gestorHistorial;
-    gestorHistorial.cargarDesdeArchivo("historial.txt");
+    gestorHistorial.cargarDesdeArchivo(Utilidades::rutaBase()+"historial.txt");
     Usuario* usuarioActivo=NULL;
     while(usuarioActivo==NULL){
         Utilidades::colorTexto(14);
@@ -51,7 +51,7 @@ int main(){
                 Utilidades::colorTexto(10);
                 cout<<"Usuario registrado con éxito. Inicie sesión\n"<<endl;
                 Utilidades::colorTexto(7);
-                gestorUsuarios.guardarEnArchivo("usuarios.txt");
+                gestorUsuarios.guardarEnArchivo(Utilidades::rutaBase()+"usuarios.txt");
             }
             else{
                 Utilidades::colorTexto(12);
@@ -169,19 +169,48 @@ int main(){
             break;
         }
         case 8:{
+            string rutaEntrada="";
+            bool confirmado=false;
+            while(!confirmado){
+                rutaEntrada=Utilidades::seleccionarArchivo();
+                if(rutaEntrada.empty()){
+                    Utilidades::colorTexto(12);
+                    cout<<"No se seleccionó ningún archivo\n"<<endl;
+                    Utilidades::colorTexto(7);
+                    break;
+                }
+                Utilidades::colorTexto(14);
+                cout<<"\nArchivo seleccionado: "<<rutaEntrada<<endl;
+                Utilidades::colorTexto(7);
+                cout<<"1. Continuar con este archivo"<<endl;
+                cout<<"2. Elegir otro archivo"<<endl;
+                int confirmacion=Utilidades::validarEntero("Opción: ",2);
+                if(confirmacion==1){
+                    confirmado=true;
+                    if(Utilidades::esArchivoTexto(rutaEntrada)){
+                        Utilidades::colorTexto(11);
+                        cout<<"\nContenido original del archivo:"<<endl;
+                        cout<<Utilidades::leerContenidoArchivo(rutaEntrada)<<"\n"<<endl;
+                        Utilidades::colorTexto(7);
+                    }
+                }
+            }
+            if(rutaEntrada.empty()){
+                break;
+            }
             Utilidades::colorTexto(14);
-            cout<<"Elija el algoritmo que desea usar: "<<endl;
+            cout<<"\nElija el algoritmo que desea usar: "<<endl;
             Utilidades::colorTexto(7);
-            cout<<"1. Cesar"<<endl;
+            cout<<"1. César"<<endl;
             cout<<"2. XOR"<<endl;
             cout<<"3. Vigenere"<<endl;
-            int algoritmo=Utilidades::validarEntero("Opcion: ",3);
+            int algoritmo=Utilidades::validarEntero("Opción: ",3);
             Utilidades::colorTexto(14);
-            cout<<"Elija la acción que desea realizar: "<<endl;
+            cout<<"\nElija la acción que desea realizar: "<<endl;
             Utilidades::colorTexto(7);
             cout<<"1. Cifrar"<<endl;
             cout<<"2. Descifrar"<<endl;
-            int accion=Utilidades::validarEntero("Opcion: ",2);
+            int accion=Utilidades::validarEntero("Opción: ",2);
             Cifrador* miCifrador=NULL;
             if(algoritmo==1){
                 int clave=Utilidades::validarEntero("Ingrese la clave (1-255): ",255);
@@ -195,31 +224,39 @@ int main(){
                 string clave=Utilidades::leerTextoNoVacio("Ingrese la clave: ");
                 miCifrador=new CifradorVigenere(clave);
             }
-            string rutaEntrada=Utilidades::seleccionarArchivo();
-            if(rutaEntrada.empty()){
-                Utilidades::colorTexto(12);
-                cout<<"No se selecciono ningun archivo\n"<<endl;
-                delete miCifrador;
-                Utilidades::colorTexto(7);
-                break;
-            }
+            Utilidades::colorTexto(14);
+            cout<<"\nSeleccione la ruta de salida. Puede escribir el nombre del archivo con su extensión (ej: resultado.jpg/resultado.txt/etc)"<<endl;
+            Utilidades::colorTexto(7);
             string rutaSalida=Utilidades::guardarArchivoComo();
             if(rutaSalida.empty()){
                 Utilidades::colorTexto(12);
-                cout<<"No se selecciono ruta de salida\n"<<endl;
+                cout<<"No se seleccionó una ruta de salida\n"<<endl;
                 Utilidades::colorTexto(7);
                 delete miCifrador;
                 break;
             }
             GestorArchivos gestor;
-            string tipoOp=(accion==1)?"Cifrado":"Descifrado";
+            string tipoOperacion=(accion==1) ? "Cifrado":"Descifrado";
             if(accion==1){
                 gestor.cifrarArchivo(miCifrador,rutaEntrada,rutaSalida);
             }
             else{
                 gestor.descifrarArchivo(miCifrador,rutaEntrada,rutaSalida);
             }
-            gestorHistorial.registrarOperacion(usuarioActivo->getNombre(),tipoOp,miCifrador->getNombreAlgoritmo(),rutaEntrada);
+            if(Utilidades::esArchivoTexto(rutaSalida)){
+                Utilidades::colorTexto(11);
+                if(accion==1){
+                    cout<<"\nContenido cifrado (hex):"<<endl;
+                    cout<<Utilidades::convertirHex(Utilidades::leerContenidoArchivo(rutaSalida))<<"\n"<<endl;
+                }
+                else{
+                    cout<<"\nContenido descifrado:"<<endl;
+                    cout<<Utilidades::leerContenidoArchivo(rutaSalida)<<"\n"<<endl;
+                }
+                Utilidades::colorTexto(7);
+            }
+            gestorHistorial.registrarOperacion(usuarioActivo->getNombre(),tipoOperacion,miCifrador->getNombreAlgoritmo(),rutaEntrada);
+            gestorHistorial.guardarEnArchivo(Utilidades::rutaBase()+"historial.txt");
             delete miCifrador;
             break;
         }
@@ -251,8 +288,8 @@ int main(){
             break;
         }
         case 10:{
-            gestorUsuarios.guardarEnArchivo("usuarios.txt");
-            gestorHistorial.guardarEnArchivo("historial.txt");
+            gestorUsuarios.guardarEnArchivo(Utilidades::rutaBase()+"usuarios.txt");
+            gestorHistorial.guardarEnArchivo(Utilidades::rutaBase()+"historial.txt");
             Utilidades::colorTexto(10);
             cout<<"Gracias por usar el cifrador de archivos!"<<endl;
             Utilidades::colorTexto(7);
