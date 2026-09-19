@@ -21,6 +21,6 @@ public:
     static bool esArchivoTexto(string ruta);
     static string leerContenidoArchivo(string ruta);
     static string rutaBase();
+    static string hashContra(string contra);
 };
-
 #endif // UTILIDADES_H

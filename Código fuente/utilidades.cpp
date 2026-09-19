@@ -1,13 +1,25 @@
+#ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <commdlg.h>
+#endif
 #include "utilidades.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <iomanip>
 #include <limits>
-#include <commdlg.h>
 #include <ctime>
+#include <cctype>
+#ifndef _WIN32
+#include <filesystem>
+#ifdef __linux__
+#include <unistd.h>
+#endif
+#ifdef __APPLE__
+#include <mach-o/dyld.h>
+#endif
+#endif
 int Utilidades::validarEntero(string mensaje,int maximo){
     int n;
     while(true){
@@ -101,24 +113,45 @@ string Utilidades::leerClaveAlfabetica(string mensaje){
     return clave;
 }
 void Utilidades::colorTexto(int color){
+#ifdef _WIN32
     HANDLE consola=GetStdHandle(STD_OUTPUT_HANDLE);
     SetConsoleTextAttribute(consola,color);
+#else
+    switch(color){
+    case 10:
+        cout<<"\033[32m";
+        break;
+    case 12:
+        cout<<"\033[31m";
+        break;
+    case 14:
+        cout<<"\033[33m";
+        break;
+    case 11:
+        cout<<"\033[36m";
+        break;
+    default:
+        cout<<"\033[0m";
+        break;
+    }
+#endif
 }
 void Utilidades::limpiarPantalla(){
 #ifdef _WIN32
     system("cls");
 #else
-system("clear");
+    system("clear");
 #endif
 }
 void Utilidades::pausarPantalla(){
     cout<<"Presione ENTER para continuar..."<<endl;
-    if(cin.rdbuf()->in_avail()>0){ //evalua si el buffer tiene algo por limpiar, si lo tiene lo limpia
+    if(cin.rdbuf()->in_avail()>0){
         cin.ignore(numeric_limits<streamsize>::max(),'\n');
     }
     cin.get();
 }
 string Utilidades::seleccionarArchivo(){
+#ifdef _WIN32
     char rutaSeleccionada[260]="";
     OPENFILENAMEA ventana;
     ZeroMemory(&ventana,sizeof(ventana));
@@ -133,8 +166,15 @@ string Utilidades::seleccionarArchivo(){
         return string(rutaSeleccionada);
     }
     return "";
+#else
+    string ruta;
+    cout<<"Ingrese la ruta del archivo: ";
+    getline(cin,ruta);
+    return ruta;
+#endif
 }
 string Utilidades::guardarArchivoComo(){
+#ifdef _WIN32
     char rutaSeleccionada[260]="";
     OPENFILENAMEA ventana;
     ZeroMemory(&ventana,sizeof(ventana));
@@ -149,6 +189,12 @@ string Utilidades::guardarArchivoComo(){
         return string(rutaSeleccionada);
     }
     return "";
+#else
+    string ruta;
+    cout<<"Ingrese la ruta del archivo: ";
+    getline(cin,ruta);
+    return ruta;
+#endif
 }
 string Utilidades::obtenerFechaHora(){
     time_t ahora=time(0);
@@ -188,9 +234,47 @@ string Utilidades::leerContenidoArchivo(string ruta){
     return flujo.str();
 }
 string Utilidades::rutaBase(){
+#ifdef _WIN32
     char ruta[MAX_PATH];
     GetModuleFileNameA(NULL,ruta,MAX_PATH);
     string rutaCompleta(ruta);
     int pos=rutaCompleta.find_last_of("\\/");
     return rutaCompleta.substr(0,pos+1);
+#elif defined(__linux__)
+    char ruta[4096];
+    ssize_t tamano=readlink("/proc/self/exe",ruta,sizeof(ruta)-1);
+    if(tamano!=-1){
+        ruta[tamano]='\0';
+        string rutaCompleta(ruta);
+        int pos=rutaCompleta.find_last_of("/");
+        return rutaCompleta.substr(0,pos+1);
+    }
+    return filesystem::current_path().string()+"/";
+#elif defined(__APPLE__)
+    uint32_t tamano=0;
+    _NSGetExecutablePath(NULL,&tamano);
+    char*ruta=new char[tamano];
+    if(_NSGetExecutablePath(ruta,&tamano)==0){
+        string rutaCompleta(ruta);
+        delete[] ruta;
+        int pos=rutaCompleta.find_last_of("/");
+        return rutaCompleta.substr(0,pos+1);
+    }
+    delete[] ruta;
+    return filesystem::current_path().string()+"/";
+#else
+    return filesystem::current_path().string()+"/";
+#endif
+}
+string Utilidades::hashContra(string contra){
+    unsigned long hash=5381; //algoritmo djb2
+    for(int i=0;i<contra.length();i++){
+        //empieza con el numero base y por cada caracter
+        //lo combina con hash*33+caracter (o mas sencillo (hash<<5)+hash
+        //se usa para multiplicar por 33 usando desplazamiento de bits
+        hash=((hash<<5)+hash)+(unsigned char)contra[i];
+    }
+    stringstream flujo;
+    flujo<<hex<<hash;
+    return flujo.str();
 }

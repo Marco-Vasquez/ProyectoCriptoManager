@@ -75,7 +75,11 @@ void GestorUsuarios::cargarDesdeArchivo(string ruta){
         getline(flujo,contra,';');
         getline(flujo,rol,';');
         if(!nombre.empty()){
-            registrarUsuario(nombre,contra,rol);
+            if(cantUsuarios==capacidad){
+                redimensionar();
+            }
+            listaUsuarios[cantUsuarios]=new Usuario(nombre,contra,rol);
+            cantUsuarios++;
         }
     }
     entrada.close();

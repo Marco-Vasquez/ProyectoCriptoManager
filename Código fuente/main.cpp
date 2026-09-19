@@ -1,6 +1,8 @@
 //Marco Vásquez 22541183 Laboratorio Progra III
+#ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#endif
 #include <iostream>
 #include <string>
 #include "cifrador.h"
@@ -13,8 +15,10 @@
 #include "historialoperaciones.h"
 using namespace std;
 int main(){
+#ifdef _WIN32
     SetConsoleOutputCP(65001);
     SetConsoleCP(65001);
+#endif
     Utilidades::colorTexto(14);
     cout<<"--- Proyecto: Cripto-Manager Cifrador y Descifrador de archivos ---"<<endl;
     Utilidades::colorTexto(7);

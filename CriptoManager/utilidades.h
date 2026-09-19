@@ -23,5 +23,4 @@ public:
     static string rutaBase();
     static string hashContra(string contra);
 };
-
 #endif // UTILIDADES_H
