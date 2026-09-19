@@ -194,3 +194,15 @@ string Utilidades::rutaBase(){
     int pos=rutaCompleta.find_last_of("\\/");
     return rutaCompleta.substr(0,pos+1);
 }
+string Utilidades::hashContra(string contra){
+    unsigned long hash=5381; //algoritmo djb2
+    for(int i=0;i<contra.length();i++){
+        //empieza con el numero base y por cada caracter
+        //lo combina con hash*33+caracter (o mas sencillo (hash<<5)+hash
+        //se usa para multiplicar por 33 usando desplazamiento de bits
+        hash=((hash<<5)+hash)+(unsigned char)contra[i];
+    }
+    stringstream flujo;
+    flujo<<hex<<hash;
+    return flujo.str();
+}

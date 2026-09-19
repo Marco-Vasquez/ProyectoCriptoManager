@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include "utilidades.h"
 GestorUsuarios::GestorUsuarios()
 {
     capacidad=5;
@@ -39,7 +40,7 @@ bool GestorUsuarios::registrarUsuario(string nombre,string contra,string rol){
     if(cantUsuarios==capacidad){
         redimensionar();
     }
-    listaUsuarios[cantUsuarios]=new Usuario(nombre,contra,rol);
+    listaUsuarios[cantUsuarios]=new Usuario(nombre,Utilidades::hashContra(contra),rol);
     cantUsuarios++;
     return true;
 }
@@ -48,7 +49,7 @@ Usuario* GestorUsuarios::login(string nombre,string contra){
     if(indice==-1){
         return NULL;
     }
-    if(listaUsuarios[indice]->getContra()==contra){
+    if(listaUsuarios[indice]->getContra()==Utilidades::hashContra(contra)){
         return listaUsuarios[indice];
     }
     return NULL;
